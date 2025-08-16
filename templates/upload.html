@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Creator Dashboard | VideoHub{% endblock %}
+
+{% block content %}
+     <h2>📤 Creator Dashboard</h2>
+     
+ 
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul class="flash-messages">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+
+<section class="upload-form">
+    <h2>Upload New Video</h2>
+    <form method="POST" action="{{ url_for('upload_video') }}" enctype="multipart/form-data">
+        <label>Title:</label>
+        <input type="text" name="title" required>
+
+        <label>Publisher:</label>
+        <input type="text" name="publisher" required>
+
+        <label>Producer:</label>
+        <input type="text" name="producer">
+
+        <label>Genre:</label>
+        <input type="text" name="genre">
+
+        <label>Age Rating:</label>
+        <select name="age_rating" required>
+            <option value="">-- Select --</option>
+            <option value="G">G</option>
+            <option value="PG">PG</option>
+            <option value="12">12</option>
+            <option value="15">15</option>
+            <option value="18">18</option>
+        </select>
+
+        <label>Video URL (optional):</label>
+        <input type="url" name="url" placeholder="https://example.com/video.mp4">
+
+        <label>Or Upload File:</label>
+        <input type="file" name="file" accept="video/*">
+
+        <button type="submit">Upload</button>
+    </form>
+</section>
+
+<section class="uploaded-videos">
+    <h2>Your Uploaded Videos</h2>
+    {% if videos %}
+        <div class="video-grid">
+            {% for video in videos %}
+                <div class="video-card">
+                    <video width="250" controls>
+                        <source src="{{ video.url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <div class="video-info">
+                        <h3>{{ video.title }}</h3>
+                        <p><strong>Genre:</strong> {{ video.genre }}</p>
+                        <p><strong>Rating:</strong> {{ video.age_rating }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>You haven't uploaded any videos yet.</p>
+    {% endif %}
+</section>
+{% endblock %}

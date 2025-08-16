@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Register | tikshare{% endblock %}
+
+{% block content %}
+<h2>Create Your Account</h2>
+<form method="POST" class="form-box">
+    <input type="text" name="username" placeholder="Username" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <select name="role" required>
+        <option value="" disabled selected>Select Role</option>
+        <option value="consumer">Consumer</option>
+        <option value="creator">Creator</option>
+    </select>
+    <button type="submit">Register</button>
+</form>
+<p>Already have an account? <a href="{{ url_for('login') }}">Login here</a>.</p>
+{% endblock %}

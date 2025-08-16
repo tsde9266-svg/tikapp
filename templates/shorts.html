@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}Shorts Feed | tikshare{% endblock %}
+
+{% block content %}
+<div class="shorts-container">
+    {% for video in videos %}
+        <div class="shorts-item">
+            <a href="{{ url_for('watch', video_id=video['id']) }}">
+                <video class="shorts-full-video" autoplay loop muted playsinline>
+                    <source src="{{ video['url'] }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+            </a>
+            <div class="shorts-overlay">
+                <div class="shorts-meta">
+                    <h3>{{ video['title'] }}</h3>
+                    <p>{{ video['publisher'] }} • Genre: {{ video['genre'] or "N/A" }} • Rated: {{ video['age_rating'] or "N/A" }}</p>
+                </div>
+                <div class="shorts-actions">
+                    <form method="POST" action="{{ url_for('like') }}" class="like-form" data-video-id="{{ video['id'] }}">
+                        <button type="button" class="like-btn" data-liked="false">❤️</button>
+                        <span class="like-count">{{ video['like_count'] }}</span>
+                    </form>
+                    <a href="{{ url_for('watch', video_id=video['id']) }}" class="comment-link">
+                        💬 {{ video['comment_count'] }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<style>
+.shorts-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+.shorts-item {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    height: 90vh;
+    background: black;
+    overflow: hidden;
+    border-radius: 8px;
+}
+.shorts-full-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.shorts-overlay {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+.shorts-meta {
+    max-width: 70%;
+    font-size: 14px;
+}
+.shorts-actions {
+    text-align: center;
+}
+.like-btn {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+}
+.like-count {
+    display: block;
+    font-size: 12px;
+}
+.comment-link {
+    display: block;
+    font-size: 18px;
+    color: white;
+    text-decoration: none;
+    margin-top: 8px;
+}
+</style>
+
+<script>
+document.querySelectorAll('.like-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+        const form = btn.closest('.like-form');
+        const videoId = form.dataset.videoId;
+        const liked = btn.dataset.liked === 'true';
+        const res = await fetch("{{ url_for('like') }}", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `video_id=${videoId}&liked=${!liked}`
+        });
+        const data = await res.json();
+        if (data.success) {
+            form.querySelector('.like-count').textContent = data.like_count;
+            btn.dataset.liked = (!liked).toString();
+        }
+    });
+});
+</script>
+{% endblock %}
